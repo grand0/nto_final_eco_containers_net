@@ -9,7 +9,8 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    UserController userController = Get.put(UserController('1'));
+    UserController userController =
+        Get.put(UserController(Get.parameters['id']!));
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +35,7 @@ class HomePage extends StatelessWidget {
                 name: model.fullName,
                 address: model.address,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
               UserLogs(actions: model.actions),
             ],
           ),

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:nto_final_eco_containers_net/screens/home_page.dart';
+import 'package:nto_final_eco_containers_net/screens/user_page.dart';
 
 void main() => runApp(
       GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Эко-контейнеры',
-        initialRoute: '/',
+        initialRoute: '/user/1',
         getPages: [
           GetPage(
-            name: '/',
+            name: '/user/:id',
             page: () => const HomePage(),
           ),
         ],
