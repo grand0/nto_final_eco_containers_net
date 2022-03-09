@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
             onPressed: () {
               userController.loadData();
             },
-            icon: const Icon(Icons.replay),
+            icon: const Icon(Icons.refresh),
             tooltip: 'Обновить',
           ),
         ],

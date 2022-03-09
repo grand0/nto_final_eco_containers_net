@@ -20,37 +20,37 @@ class AdminPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
-            children: [
-              const Padding(
+            children: const [
+              Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Text(
                   'Админ-панель',
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 44.0,
+                    fontSize: 30.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
-              const ExpandableButton(
+              SizedBox(height: 16),
+              ExpandableButton(
                 icon: Icon(Icons.person),
                 label: Text('Информация о пользователе'),
                 contents: _UserCheckWidget(),
               ),
-              const SizedBox(height: 16),
-              const ExpandableButton(
+              SizedBox(height: 16),
+              ExpandableButton(
                 icon: Icon(MdiIcons.handCoin),
                 label: Text('Изменить баланс пользователя'),
                 contents: _BalanceChangeWidget(),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               ExpandableButton(
                 icon: Icon(MdiIcons.trashCan),
                 label: Text('Информация о контейнерах'),
                 contents: _CheckContainerWidget(),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
             ],
           ),
         ),
@@ -243,10 +243,9 @@ class _CheckContainerWidget extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () {
               if (contIdEditingController.text.isNotEmpty) {
-                // SchedulerBinding.instance?.addPostFrameCallback(
-                //         (_) => Get.toNamed(
-                //         '/container/${contIdEditingController.text}'));
-                printInfo(info: 'check button pressed');
+                SchedulerBinding.instance?.addPostFrameCallback(
+                        (_) => Get.toNamed(
+                        '/container/${contIdEditingController.text}'));
               }
             },
             child: const Padding(

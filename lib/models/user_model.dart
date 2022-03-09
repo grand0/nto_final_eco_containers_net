@@ -61,7 +61,7 @@ class UserActionLog {
   });
 
   UserActionLog.fromJson(Map<String, dynamic> json) {
-    time = DateTime.parse(json['time']);
+    time = DateTime.fromMillisecondsSinceEpoch(json['time'] * 1000);
     id = json['id'];
     action = getActionByJsonName(json['action']);
     amount = json['amount'];
