@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:nto_final_eco_containers_net/controllers/container_controller.dart';
 import 'package:nto_final_eco_containers_net/screens/common/circle_light.dart';
 import 'package:nto_final_eco_containers_net/screens/common/container_logs.dart';
+import 'package:nto_final_eco_containers_net/screens/common/container_reports.dart';
 
 class ContainerPage extends StatelessWidget {
   const ContainerPage({Key? key}) : super(key: key);
@@ -117,6 +118,9 @@ class ContainerPage extends StatelessWidget {
                   : const CircularProgressIndicator(),
               const SizedBox(height: 32),
               ContainerLogs(actions: model.actions),
+              const SizedBox(height: 32),
+              ContainerReports(reports: model.reports),
+              const SizedBox(height: 32),
             ],
           ),
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nto_final_eco_containers_net/main.dart';
 import 'package:nto_final_eco_containers_net/models/user_model.dart';
 
 class UserLogs extends StatelessWidget {
@@ -12,8 +13,8 @@ class UserLogs extends StatelessWidget {
     final List<TableRow> rows = actions.map(
       (e) => TableRow(
         children: [
-          _tableCell(e.time.toString()),
-          _tableCell(e.id),
+          _tableCell(dateFormat.format(e.time)),
+          _tableCell(''),
           _tableCell(
               '${e.action == UserAction.add ? '+' : '-'}${e.amount} баллов'),
         ],

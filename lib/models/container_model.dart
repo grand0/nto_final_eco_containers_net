@@ -5,22 +5,27 @@ class ContainerModel {
   late bool locked;
   bool changingLock = false;
   late List<ContainerLog> actions;
+  late List<ContainerReport> reports;
 
   ContainerModel({
     required this.redFull,
     required this.greenFull,
     required this.blueFull,
-    required this.actions,
     required this.locked,
+    required this.actions,
+    required this.reports,
   });
 
   ContainerModel.fromJson(Map<String, dynamic> json) {
     redFull = json['red_full'];
     greenFull = json['green_full'];
     blueFull = json['blue_full'];
+    locked = json['locked'];
     actions =
         (json['actions'] as List).map((e) => ContainerLog.fromJson(e)).toList();
-    locked = json['locked'];
+    reports = (json['reports'] as List)
+        .map((e) => ContainerReport.fromJson(e))
+        .toList();
   }
 }
 
@@ -78,3 +83,59 @@ class ContainerLog {
 enum ContainerAction { add, service }
 
 enum ContainerActionType { red, green, blue, service }
+
+class ContainerReport {
+  late DateTime time;
+  late Map<ContainerDevice, bool> report;
+
+  ContainerReport(this.time, this.report);
+
+  ContainerReport.fromJson(Map<String, dynamic> json) {
+    time = DateTime.fromMillisecondsSinceEpoch(json['time'] * 1000);
+    report = {};
+    for (final d in ContainerDevice.values) {
+      report[d] = json['report'][d.getJsonName()];
+    }
+  }
+}
+
+enum ContainerDevice {
+  servoRed,
+  servoGreen,
+  servoBlue,
+  typeRed,
+  typeGreen,
+  typeBlue,
+  overflowRed,
+  overflowGreen,
+  overflowBlue,
+}
+
+extension ContainerDeviceExt on ContainerDevice {
+  String getJsonName() {
+    return toString().split('.').last;
+  }
+
+  String getTableName() {
+    switch (this) {
+      case ContainerDevice.servoRed:
+        return 'Красный сервопривод';
+      case ContainerDevice.servoGreen:
+        return 'Зеленый сервопривод';
+      case ContainerDevice.servoBlue:
+        return 'Синий сервопривод';
+      case ContainerDevice.typeRed:
+        return 'Красный сортировщик';
+      case ContainerDevice.typeGreen:
+        return 'Зеленый сортировщик';
+      case ContainerDevice.typeBlue:
+        return 'Синий сортировщик';
+      case ContainerDevice.overflowRed:
+        return 'Красный датчик переполнения';
+      case ContainerDevice.overflowGreen:
+        return 'Зеленый датчик переполнения';
+      case ContainerDevice.overflowBlue:
+        return 'Синий датчик переполнения';
+    }
+  }
+}

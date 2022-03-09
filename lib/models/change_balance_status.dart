@@ -1,0 +1,1 @@
+enum ChangeBalanceStatus { ok, wrongLogin, lowBalance }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:nto_final_eco_containers_net/main.dart';
 import 'package:nto_final_eco_containers_net/models/container_model.dart';
 
 class ContainerLogs extends StatelessWidget {
@@ -37,7 +38,7 @@ class ContainerLogs extends StatelessWidget {
         }
         return TableRow(
           children: [
-            _tableCell(e.time.toString()),
+            _tableCell(dateFormat.format(e.time)),
             _tableCell(
               e.login,
               prefix: CircleAvatar(
