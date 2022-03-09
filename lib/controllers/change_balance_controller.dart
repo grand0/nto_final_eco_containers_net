@@ -1,12 +1,11 @@
 import 'package:get/get.dart';
 import 'package:nto_final_eco_containers_net/models/change_balance_status.dart';
 import 'package:nto_final_eco_containers_net/models/user_model.dart';
-import 'package:nto_final_eco_containers_net/providers/mock_provider.dart';
 import 'package:nto_final_eco_containers_net/providers/provider.dart';
 
 class ChangeBalanceController extends GetxController
     with StateMixin<ChangeBalanceStatus> {
-  final Provider _provider = MockProvider();
+  final Provider _provider = currentProvider;
 
   @override
   void onInit() {

@@ -2,16 +2,17 @@ import 'dart:async';
 
 import 'package:get/get.dart';
 import 'package:nto_final_eco_containers_net/models/container_model.dart';
-import 'package:nto_final_eco_containers_net/providers/mock_provider.dart';
+import 'package:nto_final_eco_containers_net/providers/provider.dart';
 
 class ContainerController extends GetxController
     with StateMixin<ContainerModel> {
-  final _provider = MockProvider();
+  final Provider _provider = currentProvider;
   final String id;
   Timer? timer;
 
   ContainerController(this.id) {
     loadData();
+    change(null, status: RxStatus.loading());
   }
 
   @override

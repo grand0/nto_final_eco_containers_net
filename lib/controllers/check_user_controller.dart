@@ -1,9 +1,8 @@
 import 'package:get/get.dart';
-import 'package:nto_final_eco_containers_net/providers/mock_provider.dart';
 import 'package:nto_final_eco_containers_net/providers/provider.dart';
 
 class CheckUserController extends GetxController with StateMixin<String> {
-  final Provider _provider = MockProvider();
+  final Provider _provider = currentProvider;
 
   @override
   void onInit() {

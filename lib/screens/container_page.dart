@@ -116,6 +116,7 @@ class ContainerPage extends StatelessWidget {
             ],
           ),
         ),
+        onEmpty: const Center(child: CircularProgressIndicator()),
         onLoading: const Center(child: CircularProgressIndicator()),
         onError: (err) => Center(child: Text('ERROR: $err')),
       ),

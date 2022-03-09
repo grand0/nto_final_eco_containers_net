@@ -20,6 +20,15 @@ class AdminPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Эко-контейнеры'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Get.offNamed('/');
+            },
+            icon: const Icon(Icons.logout),
+            tooltip: 'Выйти',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -91,8 +100,8 @@ class _UserCheckWidget extends StatelessWidget {
         controller.obx(
           (id) {
             if (id != null) {
-              SchedulerBinding.instance
-                  ?.addPostFrameCallback((_) => Get.toNamed('/user/$id'));
+              SchedulerBinding.instance?.addPostFrameCallback(
+                  (_) => Get.toNamed('/user/$id', arguments: true));
             }
 
             return Padding(
