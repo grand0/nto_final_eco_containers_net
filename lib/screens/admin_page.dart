@@ -110,7 +110,10 @@ class _UserCheckWidget extends StatelessWidget {
               ),
             );
           },
-          onLoading: const CircularProgressIndicator(),
+          onLoading: const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: CircularProgressIndicator(),
+          ),
           onError: (err) {
             String errText = 'Ошибка: $err';
             if (err == 'no user') {
@@ -122,6 +125,7 @@ class _UserCheckWidget extends StatelessWidget {
                   errText,
                   style: const TextStyle(color: Colors.red),
                 ),
+                const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: ElevatedButton(
@@ -252,14 +256,16 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
                 break;
               default:
             }
+
             return Column(
               children: [
-                errText == null
-                    ? Container()
-                    : Text(
+                errText != null
+                    ? Text(
                         errText,
                         style: const TextStyle(color: Colors.red),
-                      ),
+                      )
+                    : Container(),
+                errText != null ? const SizedBox(height: 16) : Container(),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
                   child: ElevatedButton(
@@ -282,7 +288,10 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
               ],
             );
           },
-          onLoading: const CircularProgressIndicator(),
+          onLoading: const Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: CircularProgressIndicator(),
+          ),
           onError: (err) => Column(
             children: [
               Text(

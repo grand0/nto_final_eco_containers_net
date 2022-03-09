@@ -8,7 +8,7 @@ class ContainerController extends GetxController
     with StateMixin<ContainerModel> {
   final _provider = MockProvider();
   final String id;
-  late final Timer timer;
+  Timer? timer;
 
   ContainerController(this.id) {
     loadData();
@@ -21,7 +21,7 @@ class ContainerController extends GetxController
 
   @override
   void onClose() {
-    timer.cancel();
+    timer?.cancel();
     super.onClose();
   }
 
@@ -36,7 +36,7 @@ class ContainerController extends GetxController
   }
 
   void toggleLock() {
-    timer.cancel();
+    timer?.cancel();
     change(
       state
         ?..changingLock = true

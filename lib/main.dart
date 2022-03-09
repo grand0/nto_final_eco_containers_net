@@ -11,7 +11,7 @@ void main() => runApp(
       GetMaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Эко-контейнеры',
-        initialRoute: '/container/1',
+        initialRoute: '/admin',
         getPages: [
           GetPage(
             name: '/user/:id',
