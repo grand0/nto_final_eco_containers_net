@@ -3,6 +3,10 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:nto_final_eco_containers_net/controllers/change_balance_controller.dart';
+import 'package:nto_final_eco_containers_net/controllers/check_user_controller.dart';
+import 'package:nto_final_eco_containers_net/models/change_balance_status.dart';
+import 'package:nto_final_eco_containers_net/models/user_model.dart';
 import 'package:nto_final_eco_containers_net/screens/common/expandable_button.dart';
 
 class AdminPage extends StatelessWidget {
@@ -10,6 +14,9 @@ class AdminPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Get.put(CheckUserController());
+    Get.put(ChangeBalanceController());
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Эко-контейнеры'),
@@ -64,7 +71,8 @@ class _UserCheckWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final userIdEditingController = TextEditingController();
+    final loginEditingController = TextEditingController();
+    final controller = Get.find<CheckUserController>();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -72,35 +80,70 @@ class _UserCheckWidget extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
           child: TextField(
-            controller: userIdEditingController,
+            controller: loginEditingController,
             decoration: const InputDecoration(
               border: UnderlineInputBorder(),
-              labelText: 'ID пользователя',
+              labelText: 'Имя пользователя',
               prefixIcon: Icon(Icons.person),
             ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: ElevatedButton(
-            onPressed: () {
-              if (userIdEditingController.text.isNotEmpty) {
-                SchedulerBinding.instance?.addPostFrameCallback(
-                        (_) => Get.toNamed(
-                        '/user/${userIdEditingController.text}'));
-              }
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Перейти'),
-            ),
-          ),
+        controller.obx(
+          (id) {
+            if (id != null) {
+              SchedulerBinding.instance
+                  ?.addPostFrameCallback((_) => Get.toNamed('/user/$id'));
+            }
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (loginEditingController.text.isNotEmpty) {
+                    controller.getIdByLogin(loginEditingController.text);
+                  }
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text('Перейти'),
+                ),
+              ),
+            );
+          },
+          onLoading: const CircularProgressIndicator(),
+          onError: (err) {
+            String errText = 'Ошибка: $err';
+            if (err == 'no user') {
+              errText = 'Такого пользователя не существует';
+            }
+            return Column(
+              children: [
+                Text(
+                  errText,
+                  style: const TextStyle(color: Colors.red),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (loginEditingController.text.isNotEmpty) {
+                        controller.getIdByLogin(loginEditingController.text);
+                      }
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Перейти'),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ],
     );
   }
 }
-
 
 class _BalanceChangeWidget extends StatefulWidget {
   const _BalanceChangeWidget({Key? key}) : super(key: key);
@@ -110,22 +153,24 @@ class _BalanceChangeWidget extends StatefulWidget {
 }
 
 class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
-  _BalanceChangeAction? balanceAction = _BalanceChangeAction.add;
-  final balanceUserIdEditingController = TextEditingController();
+  UserAction? balanceAction = UserAction.add;
+  final balanceLoginEditingController = TextEditingController();
   final balanceAmountEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ChangeBalanceController>();
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 16.0),
           child: TextField(
-            controller: balanceUserIdEditingController,
+            controller: balanceLoginEditingController,
             decoration: const InputDecoration(
               border: UnderlineInputBorder(),
-              labelText: 'ID пользователя',
+              labelText: 'Имя пользователя',
               prefixIcon: Icon(Icons.person),
             ),
           ),
@@ -136,15 +181,15 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  balanceAction = _BalanceChangeAction.add;
+                  balanceAction = UserAction.add;
                 });
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Radio<_BalanceChangeAction>(
-                    value: _BalanceChangeAction.add,
+                  Radio<UserAction>(
+                    value: UserAction.add,
                     groupValue: balanceAction,
                     onChanged: (value) {
                       setState(() {
@@ -159,15 +204,15 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  balanceAction = _BalanceChangeAction.delete;
+                  balanceAction = UserAction.delete;
                 });
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Radio<_BalanceChangeAction>(
-                    value: _BalanceChangeAction.delete,
+                  Radio<UserAction>(
+                    value: UserAction.delete,
                     groupValue: balanceAction,
                     onChanged: (value) {
                       setState(() {
@@ -195,27 +240,81 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: ElevatedButton(
-            onPressed: () {
-              if (balanceUserIdEditingController.text.isNotEmpty &&
-                  balanceAmountEditingController.text.isNotEmpty) {
-                printInfo(info: 'execute button pressed');
-              }
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Выполнить'),
-            ),
+        controller.obx(
+          (status) {
+            String? errText;
+            switch (status) {
+              case ChangeBalanceStatus.wrongLogin:
+                errText = 'Такого пользователя не существует';
+                break;
+              case ChangeBalanceStatus.lowBalance:
+                errText = 'Недостаточно бонусов для списания';
+                break;
+              default:
+            }
+            return Column(
+              children: [
+                errText == null
+                    ? Container()
+                    : Text(
+                        errText,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16.0),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (balanceLoginEditingController.text.isNotEmpty &&
+                          balanceAmountEditingController.text.isNotEmpty &&
+                          balanceAction != null) {
+                        controller.changeBalance(
+                            balanceLoginEditingController.text,
+                            balanceAction!,
+                            int.parse(balanceAmountEditingController.text));
+                      }
+                    },
+                    child: const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Выполнить'),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+          onLoading: const CircularProgressIndicator(),
+          onError: (err) => Column(
+            children: [
+              Text(
+                'Ошибка: $err',
+                style: const TextStyle(color: Colors.red),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (balanceLoginEditingController.text.isNotEmpty &&
+                        balanceAmountEditingController.text.isNotEmpty &&
+                        balanceAction != null) {
+                      controller.changeBalance(
+                          balanceLoginEditingController.text,
+                          balanceAction!,
+                          int.parse(balanceAmountEditingController.text));
+                    }
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text('Выполнить'),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 }
-
-enum _BalanceChangeAction { add, delete }
 
 class _CheckContainerWidget extends StatelessWidget {
   const _CheckContainerWidget({Key? key}) : super(key: key);
@@ -243,9 +342,8 @@ class _CheckContainerWidget extends StatelessWidget {
           child: ElevatedButton(
             onPressed: () {
               if (contIdEditingController.text.isNotEmpty) {
-                SchedulerBinding.instance?.addPostFrameCallback(
-                        (_) => Get.toNamed(
-                        '/container/${contIdEditingController.text}'));
+                SchedulerBinding.instance?.addPostFrameCallback((_) =>
+                    Get.toNamed('/container/${contIdEditingController.text}'));
               }
             },
             child: const Padding(

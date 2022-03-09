@@ -22,9 +22,11 @@ class ContainerController extends GetxController
   @override
   void onClose() {
     timer.cancel();
+    super.onClose();
   }
 
   void loadData() {
+    change(state, status: RxStatus.loadingMore());
     _provider.getContainerData(id).then((model) {
       change(model, status: RxStatus.success());
     }, onError: (err) {

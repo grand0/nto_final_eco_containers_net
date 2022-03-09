@@ -137,7 +137,7 @@ class MockProvider extends Provider {
   Future<ChangeBalanceStatus> changeBalance(
       String login, UserAction action, int amount) {
     return Future.delayed(
-        const Duration(seconds: 1), () => ChangeBalanceStatus.ok);
+        const Duration(seconds: 1), () => ChangeBalanceStatus.wrongLogin);
   }
 
   @override

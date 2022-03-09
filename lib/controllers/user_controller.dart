@@ -22,9 +22,11 @@ class UserController extends GetxController with StateMixin<UserModel> {
   @override
   void onClose() {
     timer.cancel();
+    super.onClose();
   }
 
   void loadData() {
+    change(state, status: RxStatus.loadingMore());
     _provider.getUserData(id).then((model) {
       change(model, status: RxStatus.success());
     }, onError: (err) {
