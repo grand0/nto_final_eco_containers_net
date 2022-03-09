@@ -15,15 +15,6 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Эко-контейнеры'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              userController.loadData();
-            },
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Обновить',
-          ),
-        ],
       ),
       body: userController.obx(
         (model) => SingleChildScrollView(

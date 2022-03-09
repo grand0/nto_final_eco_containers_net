@@ -4,6 +4,7 @@ class ContainerModel {
   late bool blueFull;
   late bool locked;
   bool changingLock = false;
+  bool changingError = false;
   late List<ContainerLog> actions;
   late List<ContainerReport> reports;
 

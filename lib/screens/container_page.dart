@@ -16,14 +16,6 @@ class ContainerPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Эко-контейнеры'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              controller.loadData();
-            },
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
       ),
       body: controller.obx(
         (model) => SingleChildScrollView(
