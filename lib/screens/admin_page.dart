@@ -10,8 +10,6 @@ class AdminPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final checkUserIdEditingController = TextEditingController();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Эко-контейнеры'),
@@ -35,53 +33,22 @@ class AdminPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              ExpandableButton(
-                icon: const Icon(Icons.person),
-                label: const Text('Информация о пользователе'),
-                contents: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
-                      child: TextField(
-                        controller: checkUserIdEditingController,
-                        decoration: const InputDecoration(
-                          border: UnderlineInputBorder(),
-                          labelText: 'ID пользователя',
-                          prefixIcon: Icon(Icons.person),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (checkUserIdEditingController.text.isNotEmpty) {
-                            SchedulerBinding.instance?.addPostFrameCallback(
-                                (_) => Get.toNamed(
-                                    '/user/${checkUserIdEditingController.text}'));
-                          }
-                        },
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text('Перейти'),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              const ExpandableButton(
+                icon: Icon(Icons.person),
+                label: Text('Информация о пользователе'),
+                contents: _UserCheckWidget(),
               ),
               const SizedBox(height: 16),
-              ExpandableButton(
-                icon: const Icon(MdiIcons.handCoin),
-                label: const Text('Изменить баланс пользователя'),
+              const ExpandableButton(
+                icon: Icon(MdiIcons.handCoin),
+                label: Text('Изменить баланс пользователя'),
                 contents: _BalanceChangeWidget(),
               ),
               const SizedBox(height: 16),
               ExpandableButton(
                 icon: Icon(MdiIcons.trashCan),
                 label: Text('Информация о контейнерах'),
-                contents: Container(),
+                contents: _CheckContainerWidget(),
               ),
               const SizedBox(height: 16),
             ],
@@ -92,6 +59,49 @@ class AdminPage extends StatelessWidget {
   }
 }
 
+class _UserCheckWidget extends StatelessWidget {
+  const _UserCheckWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final userIdEditingController = TextEditingController();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
+          child: TextField(
+            controller: userIdEditingController,
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'ID пользователя',
+              prefixIcon: Icon(Icons.person),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: ElevatedButton(
+            onPressed: () {
+              if (userIdEditingController.text.isNotEmpty) {
+                SchedulerBinding.instance?.addPostFrameCallback(
+                        (_) => Get.toNamed(
+                        '/user/${userIdEditingController.text}'));
+              }
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('Перейти'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+
 class _BalanceChangeWidget extends StatefulWidget {
   const _BalanceChangeWidget({Key? key}) : super(key: key);
 
@@ -100,7 +110,7 @@ class _BalanceChangeWidget extends StatefulWidget {
 }
 
 class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
-  BalanceChangeAction? balanceAction = BalanceChangeAction.add;
+  _BalanceChangeAction? balanceAction = _BalanceChangeAction.add;
   final balanceUserIdEditingController = TextEditingController();
   final balanceAmountEditingController = TextEditingController();
 
@@ -126,15 +136,15 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  balanceAction = BalanceChangeAction.add;
+                  balanceAction = _BalanceChangeAction.add;
                 });
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Radio<BalanceChangeAction>(
-                    value: BalanceChangeAction.add,
+                  Radio<_BalanceChangeAction>(
+                    value: _BalanceChangeAction.add,
                     groupValue: balanceAction,
                     onChanged: (value) {
                       setState(() {
@@ -149,15 +159,15 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
             GestureDetector(
               onTap: () {
                 setState(() {
-                  balanceAction = BalanceChangeAction.delete;
+                  balanceAction = _BalanceChangeAction.delete;
                 });
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Radio<BalanceChangeAction>(
-                    value: BalanceChangeAction.delete,
+                  Radio<_BalanceChangeAction>(
+                    value: _BalanceChangeAction.delete,
                     groupValue: balanceAction,
                     onChanged: (value) {
                       setState(() {
@@ -191,7 +201,7 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
             onPressed: () {
               if (balanceUserIdEditingController.text.isNotEmpty &&
                   balanceAmountEditingController.text.isNotEmpty) {
-                print('button pressed');
+                printInfo(info: 'execute button pressed');
               }
             },
             child: const Padding(
@@ -205,4 +215,47 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
   }
 }
 
-enum BalanceChangeAction { add, delete }
+enum _BalanceChangeAction { add, delete }
+
+class _CheckContainerWidget extends StatelessWidget {
+  const _CheckContainerWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final contIdEditingController = TextEditingController();
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
+          child: TextField(
+            controller: contIdEditingController,
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'ID контейнера',
+              prefixIcon: Icon(Icons.person),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: ElevatedButton(
+            onPressed: () {
+              if (contIdEditingController.text.isNotEmpty) {
+                // SchedulerBinding.instance?.addPostFrameCallback(
+                //         (_) => Get.toNamed(
+                //         '/container/${contIdEditingController.text}'));
+                printInfo(info: 'check button pressed');
+              }
+            },
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text('Перейти'),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
