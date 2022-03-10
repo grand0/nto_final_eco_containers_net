@@ -50,14 +50,16 @@ class ContainerController extends GetxController
           ?..locked = locked
           ..changingLock = false);
         change(model, status: RxStatus.success());
+        timer = Timer.periodic(const Duration(seconds: 5), (_) => loadData());
       },
-      onError: (err) => change(
-        state
-          ?..changingLock = false
-          ..changingError = true,
-        status: RxStatus.success(),
-      ),
+      onError: (err) {
+        change(
+            state
+              ?..changingLock = false
+              ..changingError = true,
+            status: RxStatus.success());
+        timer = Timer.periodic(const Duration(seconds: 5), (_) => loadData());
+      },
     );
-    timer = Timer.periodic(const Duration(seconds: 5), (_) => loadData());
   }
 }

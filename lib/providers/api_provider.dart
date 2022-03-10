@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:get/get.dart';
 import 'package:nto_final_eco_containers_net/models/auth_model.dart';
 import 'package:nto_final_eco_containers_net/models/change_balance_status.dart';
 import 'package:nto_final_eco_containers_net/models/container_model.dart';
@@ -7,16 +8,18 @@ import 'package:nto_final_eco_containers_net/models/user_model.dart';
 import 'package:nto_final_eco_containers_net/providers/provider.dart';
 
 class ApiProvider extends Provider {
-  static const String url = 'http://localhost:8000/api';
+  static const String url = 'http://188.225.86.14:8000/api';
 
   @override
   Future<UserModel> getUserData(String id) async {
     final resp = await get('$url/user?id=$id');
     if (resp.status.hasError) {
+      printError(info: resp.statusText ?? 'UNKNOWN ERROR');
       return Future.error(resp.statusText ?? '');
     } else {
       try {
-        final UserModel model = UserModel.fromJson(jsonDecode(resp.bodyString ?? ''));
+        final UserModel model =
+            UserModel.fromJson(jsonDecode(resp.bodyString ?? ''));
         return model;
       } catch (e) {
         return Future.error(e);
@@ -47,8 +50,7 @@ class ApiProvider extends Provider {
       return Future.error(resp.statusText ?? '');
     } else {
       try {
-        final bool locked =
-            (jsonDecode(resp.bodyString ?? '') as Map<String, bool>)['locked']!;
+        final bool locked = jsonDecode(resp.bodyString ?? '')['locked'];
         return locked;
       } catch (e) {
         return Future.error(e);
@@ -82,7 +84,7 @@ class ApiProvider extends Provider {
       return Future.error(resp.statusText ?? '');
     } else {
       try {
-        final String statusName = (jsonDecode(resp.bodyString ?? '') as Map<String, String>)['status']!;
+        final String statusName = jsonDecode(resp.bodyString ?? '')['status']!;
         switch (statusName) {
           case 'ok':
             return ChangeBalanceStatus.ok;
@@ -105,7 +107,8 @@ class ApiProvider extends Provider {
       return Future.error(resp.statusText ?? '');
     } else {
       try {
-        final String id = (jsonDecode(resp.bodyString ?? '') as Map<String, String>)['id']!;
+        print('ID: ${jsonDecode(resp.bodyString ?? '')['id']}');
+        final String id = jsonDecode(resp.bodyString ?? '')['id'];
         if (id == '') {
           return Future.error('no user');
         }

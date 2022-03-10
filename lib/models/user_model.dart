@@ -36,7 +36,7 @@ class UserModel {
   }
 
   String get fullName =>
-      '$firstName $lastName '
+      '$lastName $firstName '
           '${patronymic == null || patronymic!.isEmpty ? '' : patronymic}';
 
   UserStatus getStatusByJsonName(String name) {

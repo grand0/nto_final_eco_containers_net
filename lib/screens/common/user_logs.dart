@@ -11,14 +11,53 @@ class UserLogs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<TableRow> rows = actions.map(
-      (e) => TableRow(
-        children: [
-          _tableCell(dateFormat.format(e.time)),
-          _tableCell(''),
-          _tableCell(
-              '${e.action == UserAction.add ? '+' : '-'}${e.amount} баллов'),
-        ],
-      ),
+      (e) {
+        Color? indicatorColor;
+        String typeText;
+        switch (e.type) {
+          case UserActionType.red:
+            indicatorColor = Colors.red;
+            typeText = 'Пластик';
+            break;
+          case UserActionType.green:
+            indicatorColor = Colors.green;
+            typeText = 'Бумага';
+            break;
+          case UserActionType.blue:
+            indicatorColor = Colors.blue;
+            typeText = 'Стекло';
+            break;
+          case UserActionType.noType:
+            indicatorColor = null;
+            typeText = 'Действие администратора';
+            break;
+        }
+        return TableRow(
+          children: [
+            _tableCell(dateFormat.format(e.time)),
+            _tableCell(
+              '${e.action == UserAction.add ? '+' : '-'}${e.amount} баллов',
+            ),
+            _tableCell(
+              typeText,
+              prefix: indicatorColor != null
+                  ? Container(
+                      width: 15,
+                      height: 15,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(7.5),
+                        color: indicatorColor,
+                      ),
+                    )
+                  : null,
+              style: e.type == UserActionType.noType ? const TextStyle(
+                color: Colors.grey,
+                fontStyle: FontStyle.italic,
+              ) : null,
+            ),
+          ],
+        );
+      },
     ).toList();
 
     return Container(
@@ -39,8 +78,8 @@ class UserLogs extends StatelessWidget {
             ),
             children: [
               _tableHeaderCell('Время'),
-              _tableHeaderCell('ID'),
               _tableHeaderCell('Действие'),
+              _tableHeaderCell('Тип мусора'),
             ],
           ),
           ...rows,
@@ -55,22 +94,35 @@ class UserLogs extends StatelessWidget {
           text,
           style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.center,
         ),
         alignment: Alignment.center,
       );
 
-  Widget _tableCell(String text) => Container(
-        height: 50,
-        child: Text(
-          text,
-          style: const TextStyle(
-            color: Colors.black,
+  Widget _tableCell(String text,
+      {Widget? prefix, Widget? suffix, TextStyle? style}) {
+    return Container(
+      height: 50,
+      alignment: Alignment.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          prefix ?? Container(),
+          prefix != null ? const SizedBox(width: 12) : Container(),
+          Text(
+            text,
+            style: style ??
+                const TextStyle(
+                  color: Colors.black,
+                ),
+            textAlign: TextAlign.center,
           ),
-          textAlign: TextAlign.center,
-        ),
-        alignment: Alignment.center,
-      );
+          suffix != null ? const SizedBox(width: 12) : Container(),
+          suffix ?? Container(),
+        ],
+      ),
+    );
+  }
 }

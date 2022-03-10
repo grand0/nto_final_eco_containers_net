@@ -18,8 +18,7 @@ class MockProvider extends Provider {
         firstName: 'Илья',
         lastName: 'Пономарев',
         patronymic: 'Иванович',
-        avatarUrl:
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/Big_Floppa_and_Justin_2_%28cropped%29.jpg/660px-Big_Floppa_and_Justin_2_%28cropped%29.jpg',
+        avatarUrl: 'http://nto-vzlet.tmweb.ru/images/1.png',
         balance: Random().nextInt(100),
         address: 'ул. Пушкина, ${Random().nextInt(100)}',
         status: UserStatus.user,
@@ -34,7 +33,7 @@ class MockProvider extends Provider {
             time: DateTime.fromMillisecondsSinceEpoch(1646729345000),
             action: UserAction.add,
             amount: Random().nextInt(30),
-            type: UserActionType.red,
+            type: UserActionType.green,
           ),
           UserActionLog(
             time: DateTime.fromMillisecondsSinceEpoch(1646729355000),

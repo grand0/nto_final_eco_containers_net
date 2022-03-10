@@ -1,4 +1,6 @@
-import 'package:crypt/crypt.dart';
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:get/get.dart';
 import 'package:nto_final_eco_containers_net/models/auth_model.dart';
 import 'package:nto_final_eco_containers_net/models/user_model.dart';
@@ -7,6 +9,7 @@ import 'package:nto_final_eco_containers_net/providers/provider.dart';
 class AuthController extends GetxController with StateMixin<AuthModel> {
   final Provider _provider = currentProvider;
   bool isAuthenticated = false;
+  String? authenticatedForId;
   UserStatus? userStatus;
 
   @override
@@ -18,7 +21,7 @@ class AuthController extends GetxController with StateMixin<AuthModel> {
   void auth(String login, String password) {
     change(null, status: RxStatus.loading());
     _provider
-        .auth(login, Crypt.sha256(password, rounds: 1, salt: '').hash)
+        .auth(login, sha256.convert(utf8.encode(password)).toString())
         .then((model) {
           if (model.isError) {
             change(null, status: RxStatus.error('no user'));
@@ -34,5 +37,6 @@ class AuthController extends GetxController with StateMixin<AuthModel> {
     change(null, status: RxStatus.empty());
     isAuthenticated = false;
     userStatus = null;
+    authenticatedForId = null;
   }
 }

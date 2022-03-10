@@ -22,18 +22,23 @@ class ContainerLogs extends StatelessWidget {
             break;
         }
         Color? indicatorColor;
+        String textType;
         switch (e.type) {
           case ContainerActionType.red:
             indicatorColor = Colors.red;
+            textType = 'Пластик';
             break;
           case ContainerActionType.green:
             indicatorColor = Colors.green;
+            textType = 'Бумага';
             break;
           case ContainerActionType.blue:
             indicatorColor = Colors.blue;
+            textType = 'Стекло';
             break;
           case ContainerActionType.service:
             indicatorColor = null;
+            textType = '';
             break;
         }
         return TableRow(
@@ -46,9 +51,10 @@ class ContainerLogs extends StatelessWidget {
                 minRadius: 15,
               ),
             ),
+            _tableCell(note),
             _tableCell(
-              note,
-              suffix: indicatorColor != null
+              textType,
+              prefix: indicatorColor != null
                   ? Container(
                       width: 15,
                       height: 15,
@@ -84,6 +90,7 @@ class ContainerLogs extends StatelessWidget {
               _tableHeaderCell('Время'),
               _tableHeaderCell('Пользователь'),
               _tableHeaderCell('Действие'),
+              _tableHeaderCell('Тип мусора'),
             ],
           ),
           ...rows,
@@ -98,7 +105,6 @@ class ContainerLogs extends StatelessWidget {
           text,
           style: const TextStyle(
             color: Colors.white,
-            fontWeight: FontWeight.bold,
           ),
           textAlign: TextAlign.center,
         ),

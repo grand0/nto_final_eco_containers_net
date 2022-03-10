@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:nto_final_eco_containers_net/controllers/auth_controller.dart';
+import 'package:nto_final_eco_containers_net/screens/common/rounded_button.dart';
+import 'package:nto_final_eco_containers_net/screens/common/rounded_text_field.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({Key? key}) : super(key: key);
+
+  void _authorize(String login, String password, AuthController controller) {
+    if (login.isNotEmpty && password.isNotEmpty) {
+      controller.auth(login, password);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,42 +39,45 @@ class AuthPage extends StatelessWidget {
                 style: TextStyle(fontSize: 30),
               ),
               const SizedBox(height: 16),
-              TextField(
+              RoundedTextField(
                 controller: loginEditingController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Логин',
-                  prefixIcon: Icon(Icons.person),
+                label: 'Логин',
+                prefixIcon: const Icon(Icons.person),
+                onSubmitted: (_) => _authorize(
+                  loginEditingController.text,
+                  passwordEditingController.text,
+                  controller,
                 ),
+                autofocus: true,
               ),
               const SizedBox(height: 16),
-              TextField(
+              RoundedTextFieldWithObscure(
                 controller: passwordEditingController,
-                decoration: const InputDecoration(
-                  border: UnderlineInputBorder(),
-                  labelText: 'Пароль',
-                  prefixIcon: Icon(Icons.lock),
+                label: 'Пароль',
+                prefixIcon: const Icon(Icons.lock),
+                onSubmitted: (_) => _authorize(
+                  loginEditingController.text,
+                  passwordEditingController.text,
+                  controller,
                 ),
-                obscureText: true,
               ),
               const SizedBox(height: 16),
               controller.obx(
                 (model) {
                   controller.userStatus = model!.status;
                   controller.isAuthenticated = true;
-                  SchedulerBinding.instance?.addPostFrameCallback(
-                      (_) => Get.offNamed('/${model.status.name}/${model.id}'));
+                  controller.authenticatedForId = model.id;
+                  SchedulerBinding.instance?.addPostFrameCallback((_) =>
+                      Get.offNamed('/${model.status?.name}/${model.id}'));
                   return const Text('Вход выполнен!');
                 },
-                onEmpty: ElevatedButton(
-                  onPressed: () {
-                    controller.auth(loginEditingController.text,
-                        passwordEditingController.text);
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text('Войти'),
+                onEmpty: RoundedButton(
+                  onPressed: () => _authorize(
+                    loginEditingController.text,
+                    passwordEditingController.text,
+                    controller,
                   ),
+                  label: 'Войти',
                 ),
                 onLoading: const CircularProgressIndicator(),
                 onError: (err) => Column(
@@ -78,16 +89,14 @@ class AuthPage extends StatelessWidget {
                       style: const TextStyle(color: Colors.red),
                     ),
                     const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        controller.auth(loginEditingController.text,
-                            passwordEditingController.text);
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('Войти'),
+                    RoundedButton(
+                      onPressed: () => _authorize(
+                        loginEditingController.text,
+                        passwordEditingController.text,
+                        controller,
                       ),
-                    ),
+                      label: 'Войти',
+                    )
                   ],
                 ),
               ),

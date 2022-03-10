@@ -3,19 +3,37 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:nto_final_eco_containers_net/controllers/auth_controller.dart';
 import 'package:nto_final_eco_containers_net/controllers/change_balance_controller.dart';
 import 'package:nto_final_eco_containers_net/controllers/check_user_controller.dart';
+import 'package:nto_final_eco_containers_net/controllers/user_controller.dart';
 import 'package:nto_final_eco_containers_net/models/change_balance_status.dart';
 import 'package:nto_final_eco_containers_net/models/user_model.dart';
 import 'package:nto_final_eco_containers_net/screens/common/expandable_button.dart';
+import 'package:nto_final_eco_containers_net/screens/common/rounded_button.dart';
+import 'package:nto_final_eco_containers_net/screens/common/rounded_text_field.dart';
+import 'package:nto_final_eco_containers_net/screens/common/user_info.dart';
 
 class AdminPage extends StatelessWidget {
   const AdminPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    String id = Get.parameters['id']!;
+
+    final authController = Get.find<AuthController>();
+    if (!authController.isAuthenticated ||
+        !(authController.userStatus == UserStatus.admin &&
+            authController.authenticatedForId == id)) {
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
+        Get.offNamed('/');
+      });
+    }
+
     Get.put(CheckUserController());
     Get.put(ChangeBalanceController());
+    final UserController userController =
+        Get.put(UserController(id), tag: 'admin');
 
     return Scaffold(
       appBar: AppBar(
@@ -36,37 +54,46 @@ class AdminPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
-            children: const [
-              Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text(
-                  'Админ-панель',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+            children: [
+              const SizedBox(height: 16),
+              userController.obx(
+                (model) => UserInfo(
+                  balance: 0,
+                  avatarUrl: model!.avatarUrl,
+                  name: model.fullName,
+                  address: model.address,
+                  login: model.login,
+                  id: id,
+                  showBalance: false,
                 ),
               ),
-              SizedBox(height: 16),
-              ExpandableButton(
+              const SizedBox(height: 32),
+              const Text(
+                'Админ-панель',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 30.0,
+                ),
+              ),
+              const SizedBox(height: 16),
+              const ExpandableButton(
                 icon: Icon(Icons.person),
                 label: Text('Информация о пользователе'),
                 contents: _UserCheckWidget(),
               ),
-              SizedBox(height: 16),
-              ExpandableButton(
+              const SizedBox(height: 16),
+              const ExpandableButton(
                 icon: Icon(MdiIcons.handCoin),
                 label: Text('Изменить баланс пользователя'),
                 contents: _BalanceChangeWidget(),
               ),
-              SizedBox(height: 16),
-              ExpandableButton(
+              const SizedBox(height: 16),
+              const ExpandableButton(
                 icon: Icon(MdiIcons.trashCan),
                 label: Text('Информация о контейнерах'),
                 contents: _CheckContainerWidget(),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -78,6 +105,12 @@ class AdminPage extends StatelessWidget {
 class _UserCheckWidget extends StatelessWidget {
   const _UserCheckWidget({Key? key}) : super(key: key);
 
+  void submit(String login, CheckUserController controller) {
+    if (login.isNotEmpty) {
+      controller.getIdByLogin(login);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loginEditingController = TextEditingController();
@@ -87,14 +120,12 @@ class _UserCheckWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
-          child: TextField(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 16.0),
+          child: RoundedTextField(
             controller: loginEditingController,
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Имя пользователя',
-              prefixIcon: Icon(Icons.person),
-            ),
+            label: 'Имя пользователя',
+            prefixIcon: const Icon(Icons.person),
+            onSubmitted: (_) => submit(loginEditingController.text, controller),
           ),
         ),
         controller.obx(
@@ -103,19 +134,13 @@ class _UserCheckWidget extends StatelessWidget {
               SchedulerBinding.instance?.addPostFrameCallback(
                   (_) => Get.toNamed('/user/$id', arguments: true));
             }
-
             return Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  if (loginEditingController.text.isNotEmpty) {
-                    controller.getIdByLogin(loginEditingController.text);
-                  }
-                },
-                child: const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text('Перейти'),
-                ),
+              child: RoundedButton(
+                label: 'Перейти',
+                onPressed: () =>
+                    submit(loginEditingController.text, controller),
+                width: 350,
               ),
             );
           },
@@ -137,16 +162,11 @@ class _UserCheckWidget extends StatelessWidget {
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (loginEditingController.text.isNotEmpty) {
-                        controller.getIdByLogin(loginEditingController.text);
-                      }
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Перейти'),
-                    ),
+                  child: RoundedButton(
+                    label: 'Перейти',
+                    onPressed: () =>
+                        submit(loginEditingController.text, controller),
+                    width: 350,
                   ),
                 ),
               ],
@@ -170,6 +190,17 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
   final balanceLoginEditingController = TextEditingController();
   final balanceAmountEditingController = TextEditingController();
 
+  void submit(ChangeBalanceController controller) {
+    if (balanceLoginEditingController.text.isNotEmpty &&
+        balanceAmountEditingController.text.isNotEmpty &&
+        balanceAction != null) {
+      controller.changeBalance(
+          balanceLoginEditingController.text,
+          balanceAction!,
+          int.parse(balanceAmountEditingController.text));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<ChangeBalanceController>();
@@ -178,14 +209,12 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 16.0),
-          child: TextField(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 16.0),
+          child: RoundedTextField(
             controller: balanceLoginEditingController,
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Имя пользователя',
-              prefixIcon: Icon(Icons.person),
-            ),
+            label: 'Имя пользователя',
+            prefixIcon: const Icon(Icons.person),
+            onSubmitted: (_) => submit(controller),
           ),
         ),
         Row(
@@ -240,14 +269,12 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
           ],
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
-          child: TextField(
+          padding: const EdgeInsets.fromLTRB(24.0, 16.0, 24.0, 16.0),
+          child: RoundedTextField(
             controller: balanceAmountEditingController,
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Бонусов',
-              prefixIcon: Icon(Icons.toll),
-            ),
+            label: 'Бонусов',
+            prefixIcon: const Icon(Icons.toll),
+            onSubmitted: (_) => submit(controller),
             inputFormatters: [
               FilteringTextInputFormatter.allow(RegExp(r'[1-9][0-9]*')),
             ],
@@ -263,37 +290,29 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
               case ChangeBalanceStatus.lowBalance:
                 errText = 'Недостаточно бонусов для списания';
                 break;
+              case ChangeBalanceStatus.ok:
+                errText = 'Баланс изменён';
+                break;
               default:
             }
-
             return Column(
               children: [
                 errText != null
                     ? Text(
                         errText,
-                        style: const TextStyle(color: Colors.red),
+                        style: TextStyle(
+                            color: status == ChangeBalanceStatus.ok
+                                ? Colors.green
+                                : Colors.red),
                       )
                     : Container(),
                 errText != null ? const SizedBox(height: 16) : Container(),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (balanceLoginEditingController.text.isNotEmpty &&
-                          balanceAmountEditingController.text.isNotEmpty &&
-                          balanceAction != null) {
-                        controller.changeBalance(
-                            balanceLoginEditingController.text,
-                            balanceAction!,
-                            int.parse(balanceAmountEditingController.text));
-                      }
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Выполнить'),
-                    ),
-                  ),
+                RoundedButton(
+                  onPressed: () => submit(controller),
+                  label: 'Выполнить',
+                  width: 350,
                 ),
+                const SizedBox(height: 16),
               ],
             );
           },
@@ -307,23 +326,13 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
                 'Ошибка: $err',
                 style: const TextStyle(color: Colors.red),
               ),
+              const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.only(bottom: 16.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (balanceLoginEditingController.text.isNotEmpty &&
-                        balanceAmountEditingController.text.isNotEmpty &&
-                        balanceAction != null) {
-                      controller.changeBalance(
-                          balanceLoginEditingController.text,
-                          balanceAction!,
-                          int.parse(balanceAmountEditingController.text));
-                    }
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text('Выполнить'),
-                  ),
+                child: RoundedButton(
+                  onPressed: () => submit(controller),
+                  label: 'Выполнить',
+                  width: 350,
                 ),
               ),
             ],
@@ -337,6 +346,13 @@ class _BalanceChangeWidgetState extends State<_BalanceChangeWidget> {
 class _CheckContainerWidget extends StatelessWidget {
   const _CheckContainerWidget({Key? key}) : super(key: key);
 
+  void submit(String id) {
+    if (id.isNotEmpty) {
+      SchedulerBinding.instance?.addPostFrameCallback((_) =>
+          Get.toNamed('/container/$id'));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final contIdEditingController = TextEditingController();
@@ -345,29 +361,20 @@ class _CheckContainerWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 0.0, 24.0, 24.0),
-          child: TextField(
+          padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 16.0),
+          child: RoundedTextField(
+            label: 'ID контейнера',
             controller: contIdEditingController,
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'ID контейнера',
-              prefixIcon: Icon(Icons.person),
-            ),
+            prefixIcon: const Icon(Icons.tag),
+            onSubmitted: (_) => submit(contIdEditingController.text),
           ),
         ),
         Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
-          child: ElevatedButton(
-            onPressed: () {
-              if (contIdEditingController.text.isNotEmpty) {
-                SchedulerBinding.instance?.addPostFrameCallback((_) =>
-                    Get.toNamed('/container/${contIdEditingController.text}'));
-              }
-            },
-            child: const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text('Перейти'),
-            ),
+          child: RoundedButton(
+            onPressed: () => submit(contIdEditingController.text),
+            label: 'Перейти',
+            width: 350,
           ),
         ),
       ],

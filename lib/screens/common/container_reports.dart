@@ -21,9 +21,11 @@ class ContainerReports extends StatelessWidget {
         return TableRow(
           children: cells.map((e) {
             if (e is DateTime) {
-              return _tableCell(Text(dateFormat.format(e)));
+              return _tableCell(Text(
+                dateFormat.format(e),
+                textAlign: TextAlign.center,
+              ));
             }
-
             return _tableCell(
               e
                   ? const Icon(
@@ -69,19 +71,25 @@ class ContainerReports extends StatelessWidget {
     );
   }
 
-  Widget _tableHeaderCell(String text) => RotatedBox(
-        quarterTurns: 1,
-        child: Container(
-          height: 50,
-          child: Text(
-            text.replaceAll(' ', '\n'),
-            style: const TextStyle(
-              color: Colors.white,
+  Widget _tableHeaderCell(String text) => Column(
+        children: [
+          const SizedBox(height: 8),
+          RotatedBox(
+            quarterTurns: 1,
+            child: Container(
+              height: 50,
+              child: Text(
+                text.replaceAll(' ', '\n'),
+                style: const TextStyle(
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              alignment: Alignment.center,
             ),
-            textAlign: TextAlign.center,
           ),
-          alignment: Alignment.center,
-        ),
+          const SizedBox(height: 8),
+        ],
       );
 
   Widget _tableCell(Widget content) => Container(

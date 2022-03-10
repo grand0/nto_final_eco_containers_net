@@ -95,7 +95,7 @@ class ContainerReport {
     time = DateTime.fromMillisecondsSinceEpoch(json['time'] * 1000);
     report = {};
     for (final d in ContainerDevice.values) {
-      report[d] = json['report'][d.getJsonName()];
+      report[d] = json[d.getJsonName()];
     }
   }
 }
@@ -120,23 +120,23 @@ extension ContainerDeviceExt on ContainerDevice {
   String getTableName() {
     switch (this) {
       case ContainerDevice.servoRed:
-        return 'Красный сервопривод';
+        return 'Сервопривод (пластик)';
       case ContainerDevice.servoGreen:
-        return 'Зеленый сервопривод';
+        return 'Сервопривод (бумага)';
       case ContainerDevice.servoBlue:
-        return 'Синий сервопривод';
+        return 'Сервопривод (стекло)';
       case ContainerDevice.typeRed:
-        return 'Красный сортировщик';
+        return 'Датчик пластика';
       case ContainerDevice.typeGreen:
-        return 'Зеленый сортировщик';
+        return 'Датчик бумаги';
       case ContainerDevice.typeBlue:
-        return 'Синий сортировщик';
+        return 'Датчик стекла';
       case ContainerDevice.overflowRed:
-        return 'Красный датчик переполнения';
+        return 'Датчик переполнения пластика';
       case ContainerDevice.overflowGreen:
-        return 'Зеленый датчик переполнения';
+        return 'Датчик переполнения бумаги';
       case ContainerDevice.overflowBlue:
-        return 'Синий датчик переполнения';
+        return 'Датчик переполнения стекла';
     }
   }
 }
